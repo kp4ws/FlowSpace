@@ -2,7 +2,7 @@ name: Deploy FlowSpace
 
 on:
   push:
-    branches: [main]
+    branches: [master]
 
 jobs:
   # Job 1: Frontend Deployment
