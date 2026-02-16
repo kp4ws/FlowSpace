@@ -1,0 +1,16 @@
+{
+    "name": "flowspace-monorepo",
+    "version": "1.0.0",
+    "description": "FlowSpace Freelancer Toolkit Monorepo",
+    "scripts": {
+        "dev": "docker-compose up -d",
+        "stop": "docker-compose down",
+        "build": "docker-compose build",
+        "logs": "docker-compose logs -f",
+        "api:dev": "cd api && .venv/Scripts/activate && uvicorn app.main:app --reload",
+        "web:dev": "cd web && npm run dev"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+}

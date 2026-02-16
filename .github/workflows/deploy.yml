@@ -1,0 +1,51 @@
+name: Deploy FlowSpace
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  # Job 1: Frontend Deployment
+  # NOTE: Automated checks for the frontend.
+  frontend-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: cd web && npm install
+      - name: Build frontend
+        run: cd web && npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+
+  # Job 2: Backend Deployment via SSH
+  backend-deploy:
+    needs: frontend-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy files to VM
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "./api/*,docker-compose.yml"
+          target: "~/app"
+
+      - name: Restart Backend with Docker Compose
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/app
+            echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > api/.env
+            echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> api/.env
+            echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> api/.env
+            echo "ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}" >> api/.env
+            docker-compose up -d --build api
