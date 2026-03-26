@@ -14,7 +14,6 @@
 **Frontend:**
 - Next.js & React
 - Tailwind CSS
-- PWA & Dexie (IndexedDB Offline Storage)
 
 **Backend / Database:**
 - Python (FastAPI)
