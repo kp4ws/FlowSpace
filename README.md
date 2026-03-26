@@ -22,11 +22,3 @@
 
 **Infrastructure:**
 - Docker & Docker Compose
-
-## 🚀 Getting Started
-**Run with Docker Compose:**
-1. Clone the repository.
-2. Configure your environment variables for Supabase and the API URL.
-3. Start the application:
-```bash
-docker-compose up --build
